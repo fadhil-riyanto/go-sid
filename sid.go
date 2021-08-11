@@ -2,12 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
-
+	"runtime"
 	"github.com/gookit/color"
 )
 
@@ -38,6 +39,8 @@ func (hh *init_tampilan) initgaris() {
 }
 
 func main() {
+	runtime.GOMAXPROCS(1) //KLO punya cpu lebih silahkan ditambahkan gpp
+
 	menginit := init_tampilan{}
 	menginit.initcli()
 	menginit.initgaris()
@@ -73,10 +76,18 @@ func main() {
 			var hasilapi detail_shorturl
 			if error := json.Unmarshal(body, &hasilapi); error != nil {
 				color.Red.Println("sori, respon server memberikan nilai balik engga valid")
+			} else {
+				color.Green.Println("URL      : http://s.id/" + hasilapi.Short)
+				color.Green.Println("URL asli : " + hasilapi.Long_url)
 			}
+			mmss := make(chan string)
+			enc := func() {
+				var data = fmt.Sprintf("\n\nThanks")
+				mmss <- data
 
-			color.Green.Println("URL      : http://s.id/" + hasilapi.Short)
-			color.Green.Println("URL asli : " + hasilapi.Long_url)
+			}
+			go enc()
+			fmt.Println(<-mmss)
 
 		}
 
